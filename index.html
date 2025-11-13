@@ -1,31 +1,131 @@
 <html>
+
 <body>
-<div id="g"></div>
-<style>
-#g{display:fixed;inset:0;display:grid;grid-template-columns:repeat(25,1fr);color:#026;background:#026;}
-@keyframes b{from{color:#026;}to{color:#3b7;}}
-@keyframes l{from{color:#3b7;}to{color:#026;}}
-@keyframes c{0%{color:#3b7;}33%{color:#d80;}100%{color:#026;}}
-.a{color:#3b7;}
-.b{animation: b 500ms;}
-.l{animation: l 500ms;}
-.c{animation: c 500ms;}
-#g *{display:block;width:min(4dvw,4dvh);aspect-ratio:1;background-image:radial-gradient(circle at center,currentColor,transparent);}
-</style>
-<script>
-w=25
-d=document
-t=setTimeout
-g=d.getElementById('g')
-p=Array.from({length:w*w}).map(i=>d.createElement('i'))
-for(e of p){g.appendChild(e);(Math.random()>=0.5)&&e.classList.add('a');}
-n=e=>{let t=p.indexOf(e);let k=[t-w,t+w,--t,t-w,(t++)+w,++t,t-w,t+w];return p.filter((v,i)=>k.includes(i))}
-a=(e,a='a')=>e.classList.contains(a)
-f=e=>n(e).filter(v=>a(v)).length
-c=(e,r)=>e.classList.remove(r)
-s=(e,a,r)=>{e.classList.add(a);r&&t(()=>c(e,r),20)}
-v=()=>{for (e of p) {['b','l','c'].map(l=>c(e,l));let m=f(e);a(e)?((m<3&&s(e,'l','a'))||(m>4&&s(e,'c','a'))):m>2&&(s(e,'b')&&t(()=>s(e,'l','b'),500))};t(v,600)}
-t(v,600)
-</script>
+    <div id="g"></div>
+    <style>
+        #g {
+            display: fixed;
+            inset: 0;
+            display: grid;
+            grid-template-columns: repeat(25, 1fr);
+            color: #026;
+            background: #026;
+        }
+
+        @keyframes b {
+            from {
+                color: #026;
+            }
+
+            to {
+                color: #3b7;
+            }
+        }
+
+        @keyframes l {
+            from {
+                color: #3b7;
+            }
+
+            to {
+                color: #026;
+            }
+        }
+
+        @keyframes c {
+            0% {
+                color: #3b7;
+            }
+
+            33% {
+                color: #d80;
+            }
+
+            100% {
+                color: #026;
+            }
+        }
+
+        .a {
+            color: #3b7;
+        }
+
+        .b {
+            animation: b 500ms;
+        }
+
+        .l {
+            animation: l 500ms;
+        }
+
+        .c {
+            animation: c 500ms;
+        }
+
+        #g * {
+            display: block;
+            width: min(4dvw, 4dvh);
+            aspect-ratio: 1;
+            background-image: radial-gradient(circle at center, currentColor, transparent);
+        }
+    </style>
+    <script>
+        const width = 25
+        const column = v => (v * width) || 1
+        const d = document
+        const t = setTimeout
+        const g = d.getElementById('g')
+        const elements = Array.from({ length: width * width })
+            .map(i => d.createElement('i'))
+        for (e of elements) {
+            g.appendChild(e);
+            if (Math.random() >= 0.5) {
+                e.classList.add('a');
+            }
+        }
+        const neighbors = e => {
+            let i = elements.indexOf(e);
+            let [x, y] = [i % width, Math.floor(i / width)];
+            let k = [];
+            for (k = x - 1; k < x + 2; k++) {
+                for (j = y - 1; j < y + 2; j++) {
+                    if (k >= 0 && j >= 0 && (k != x || j != y)) {
+                        k.push((k || 1) * (column(j) || 1))
+                    }
+                }
+            };
+            return elements.filter((v, i) => k.includes(i))
+        }
+        const is_alive = (e, a = 'a') => e.classList.contains(a)
+        const comminity = e => neighbors(e).filter(v => is_alive(v)).length
+        const clear = (e, r) => e.classList.remove(r)
+        const set = (e, a, r) => {
+            e.classList.add(a);
+            if (r) {
+                t(() => clear(e, r), 20)
+            }
+        }
+        const step = () => {
+            for (e of elements) {
+                ['b', 'l', 'c'].map(l => clear(e, l));
+                let m = comminity(e);
+                if (is_alive(e)) {
+                    if (m < 3) {
+                        set(e, 'l', 'a')
+                     } else if (m > 4) {
+                         set(e, 'c', 'a')
+                     }
+                } else {
+                    if (m > 2) {
+                        set(e, 'b');
+                        t(() => set(e, 'l', 'b'), 500)
+                    }
+                }
+            }
+            t(step, 600)
+        }
+        t(step, 600)
+    </script>
 </body>
+
 </html>
