@@ -15,11 +15,17 @@
 <script>
 w=25
 d=document
+t=setTimeout
 g=d.getElementById('g')
 p=Array.from({length:w*w}).map(i=>d.createElement('i'))
-for(e of p){g.appendChild(e);Math.random()>0.5&&g.classList.add('a')}
+for(e of p){g.appendChild(e);(Math.random()>=0.5)&&e.classList.add('a');}
 n=e=>{let t=p.indexOf(e);let k=[t-w,t+w,--t,t-w,(t++)+w,++t,t-w,t+w];return p.filter((v,i)=>k.includes(i))}
-a=e=>n(e).filter(v=>!!v.classList).length
+a=(e,a='a')=>e.classList.contains(a)
+f=e=>n(e).filter(v=>a(v)).length
+c=(e,r)=>e.classList.remove(r)
+s=(e,a,r)=>{e.classList.add(a);r&&t(()=>c(e,r),20)}
+v=()=>{for (e of p) {['b','l','c'].map(l=>c(e,l));let m=f(e);a(e)?((m<3&&s(e,'l','a'))||(m>4&&s(e,'c','a'))):m>2&&(s(e,'b')&&t(()=>s(e,'l','b'),500))};t(v,600)}
+t(v,600)
 </script>
 </body>
 </html>
