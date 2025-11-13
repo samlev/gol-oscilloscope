@@ -75,29 +75,6 @@
         const d = document
         const t = setTimeout
         const g = d.getElementById('g')
-        const elements = Array.from({ length: width * width })
-            .map(i => d.createElement('i'))
-        for (e of elements) {
-            g.appendChild(e);
-            if (Math.random() >= 0.5) {
-                e.classList.add('a');
-            }
-        }
-        const neighbors = e => {
-            let i = elements.indexOf(e);
-            let [x, y] = [i % width, Math.floor(i / width)];
-            let k = [];
-            for (k = x - 1; k < x + 2; k++) {
-                for (j = y - 1; j < y + 2; j++) {
-                    if (k >= 0 && j >= 0 && (k != x || j != y)) {
-                        k.push((k || 1) * (column(j) || 1))
-                    }
-                }
-            };
-            return elements.filter((v, i) => k.includes(i))
-        }
-        const is_alive = (e, a = 'a') => e.classList.contains(a)
-        const comminity = e => neighbors(e).filter(v => is_alive(v)).length
         const clear = (e, r) => e.classList.remove(r)
         const set = (e, a, r) => {
             e.classList.add(a);
@@ -105,20 +82,50 @@
                 t(() => clear(e, r), 20)
             }
         }
+        const elements = Array.from({ length: width })
+            .map((z, y) => Array.from({ length: width })
+                .map((z, x) => {
+                    const e = d.createElement('i')
+                    e.setAttribute('data-c', `${x}|${y}`)
+                    g.appendChild(e)
+                    if (Math.random() >= 0.5) {
+                        set(e, 'a')
+                    }
+                    return e
+                }))
+
+        const is_alive = (e, a = 'a') => e.classList.contains(a)
+        const neighbors = e => {
+            let [x, y] = e.getAttribute('data-c').split('|');
+            let coords = [];
+            for (k = x - 1; k < x + 2; k++) {
+                for (j = y - 1; j < y + 2; j++) {
+                    if (k != x && j != y) {
+                        const n = elements[k]?.[j]
+                        if (n && is_alive(n)) {
+                            coords.push(n)
+                        }
+                    }
+                }
+            }
+            return coords.length
+        }
         const step = () => {
-            for (e of elements) {
-                ['b', 'l', 'c'].map(l => clear(e, l));
-                let m = comminity(e);
-                if (is_alive(e)) {
-                    if (m < 3) {
-                        set(e, 'l', 'a')
-                     } else if (m > 4) {
-                         set(e, 'c', 'a')
-                     }
-                } else {
-                    if (m > 2) {
-                        set(e, 'b');
-                        t(() => set(e, 'l', 'b'), 500)
+            for (const row of elements) {
+                for (const e of row) {
+                    ['b', 'l', 'c'].map(l => clear(e, l));
+                    let m = neighbors(e);
+                    if (is_alive(e)) {
+                        if (m < 2) {
+                            set(e, 'l', 'a')
+                        } else if (m > 3) {
+                            set(e, 'c', 'a')
+                        }
+                    } else {
+                        if (m === 3) {
+                            set(e, 'b');
+                            t(() => set(e, 'a', 'b'), 500)
+                        }
                     }
                 }
             }
