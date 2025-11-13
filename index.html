@@ -1,14 +1,22 @@
 <html>
 <body>
 <style>
-#g{display:fixed;inset:0;display:flex;flex-wrap:wrap;align-items:space-around;justify-content:space-around;--o:#026;--i:#3b7;background:var(--o);}
-#g *{aspect-ratio:1;}
+#g{display:fixed;inset:0;display:flex;flex-wrap:wrap;align-items:space-around;justify-content:space-around;color:#026;background:#026;}
+@keyframes b{from{color:#026;}to{color:#3b7;}}
+@keyframes l{from{color:#3b7;}to{color:#026;}}
+@keyframes c{0%{color:#3b7;}33%{color:#d80;}100%{color:#026;}}
+.l{--i:#3b7;}
+.w{--o:#3b7;--i:#ab3;}
+.c{--o:#ab3;--i:#d80;}
+#g *{aspect-ratio:1;background-image:radial-gradient(circle at center,currentColor,transparent);}
 </style>
 <script>
-let w=25;
-let {getElementByID:f,createElement:c}=document;
-let g=f('g');
-let p=Array.from({length:w*w}).map(i=>c('i')).forEach(g.append);
+w=25
+{getElementByID:f,createElement:c}=document
+g=f('g')
+p=Array.from({length:w*w}).map(i=>c('i')).forEach(g.append)
+n=e=>{let t=p.indexOf(e);let k=[t-w,t+w,--t,t-w,(t++)+w,++t,t-w,t+w]return p.filter((v,i)=>k.includes(i))})
+a=e=>n(e).filter(v=>v classList.includes('l').length)
 </script>
 <div id="g"></div>
 </body>
