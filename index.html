@@ -1,23 +1,25 @@
 <html>
 <body>
+<div id="g"></div>
 <style>
-#g{display:fixed;inset:0;display:flex;flex-wrap:wrap;align-items:space-around;justify-content:space-around;color:#026;background:#026;}
+#g{display:fixed;inset:0;display:grid;grid-template-columns:repeat(25,1fr);color:#026;background:#026;}
 @keyframes b{from{color:#026;}to{color:#3b7;}}
 @keyframes l{from{color:#3b7;}to{color:#026;}}
 @keyframes c{0%{color:#3b7;}33%{color:#d80;}100%{color:#026;}}
-.l{--i:#3b7;}
-.w{--o:#3b7;--i:#ab3;}
-.c{--o:#ab3;--i:#d80;}
-#g *{aspect-ratio:1;background-image:radial-gradient(circle at center,currentColor,transparent);}
+.a{color:#3b7;}
+.b{animation: b 500ms;}
+.l{animation: l 500ms;}
+.c{animation: c 500ms;}
+#g *{display:block;width:min(4dvw,4dvh);aspect-ratio:1;background-image:radial-gradient(circle at center,currentColor,transparent);}
 </style>
 <script>
 w=25
-{getElementByID:f,createElement:c}=document
-g=f('g')
-p=Array.from({length:w*w}).map(i=>c('i')).forEach(g.append)
-n=e=>{let t=p.indexOf(e);let k=[t-w,t+w,--t,t-w,(t++)+w,++t,t-w,t+w]return p.filter((v,i)=>k.includes(i))})
-a=e=>n(e).filter(v=>v classList.includes('l').length)
+d=document
+g=d.getElementById('g')
+p=Array.from({length:w*w}).map(i=>d.createElement('i'))
+for(e of p){g.appendChild(e);Math.random()>0.5&&g.classList.add('a')}
+n=e=>{let t=p.indexOf(e);let k=[t-w,t+w,--t,t-w,(t++)+w,++t,t-w,t+w];return p.filter((v,i)=>k.includes(i))}
+a=e=>n(e).filter(v=>!!v.classList).length
 </script>
-<div id="g"></div>
 </body>
 </html>
