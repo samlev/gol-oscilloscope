@@ -1,7 +1,15 @@
 <html>
 <body>
-<style>#c{display:fixed;inset:0;display:flex;flex:25;flex-wrap:wrap;align-items:stretch;justify-content:space-around;}</style>
-<script></script>
-<div id="c"></div>
+<style>
+#g{display:fixed;inset:0;display:flex;flex-wrap:wrap;align-items:space-around;justify-content:space-around;--o:#026;--i:#3b7;background:var(--o);}
+#g *{aspect-ratio:1;}
+</style>
+<script>
+let w=25;
+let {getElementByID:f,createElement:c}=document;
+let g=f('g');
+let p=Array.from({length:w*w}).map(i=>c('i')).forEach(g.append);
+</script>
+<div id="g"></div>
 </body>
 </html>
