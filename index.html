@@ -8,8 +8,11 @@
             inset: 0;
             display: grid;
             grid-template-columns: repeat(25, 1fr);
+            grid-template-rows: repeat(25, 1fr);
             color: #026;
             background: #026;
+            aspect-ratio: 1;
+            overflow: hidden;
         }
 
         @keyframes b {
@@ -37,7 +40,7 @@
                 color: #3b7;
             }
 
-            33% {
+            80% {
                 color: #d80;
             }
 
@@ -46,92 +49,114 @@
             }
         }
 
-        .a {
-            color: #3b7;
-        }
 
-        .b {
-            animation: b 500ms;
-        }
-
-        .l {
-            animation: l 500ms;
-        }
-
-        .c {
-            animation: c 500ms;
-        }
-
-        #g * {
-            display: block;
+        #g>* {
+            position: relative;
             width: min(4dvw, 4dvh);
             aspect-ratio: 1;
-            background-image: radial-gradient(circle at center, currentColor, transparent);
+            border: 0;
+            color: transparent;
+            background: transparent;
+
+            * {
+                border-radius: 100%;
+                display: block;
+                position: absolute;
+                top: -25%;
+                left: -25%;
+                bottom: -25%;
+                right: -25%;
+                background: transparent radial-gradient(circle at center, currentColor, #0260 65%);
+            }
+
+            &.a {
+                color: #3b7;
+            }
+
+            &.b {
+                animation: b 300ms;
+            }
+
+            &.l {
+                animation: l 300ms;
+            }
+
+            &.c {
+                animation: c 300ms;
+            }
         }
     </style>
     <script>
         const width = 25
         const column = v => (v * width) || 1
         const d = document
+        const ce = t=>d.createElement(t)
+        const ac = (e,c) => e.appendChild(c);
         const t = setTimeout
         const g = d.getElementById('g')
-        const clear = (e, r) => e.classList.remove(r)
+        const cl = e => e.classList
+        const clear = (e, r) => cl(e).remove(r)
         const set = (e, a, r) => {
-            e.classList.add(a);
+            cl(e).add(a);
             if (r) {
-                t(() => clear(e, r), 20)
+                t(() => clear(e, r), 50)
             }
         }
         const elements = Array.from({ length: width })
             .map((z, y) => Array.from({ length: width })
                 .map((z, x) => {
-                    const e = d.createElement('i')
-                    e.setAttribute('data-c', `${x}|${y}`)
-                    g.appendChild(e)
+                    const e = ce('button')
+                    e.onclick = () => cl(e).toggle('a')
+                    ac(e,ce('i'))
+                    ac(g, e)
                     if (Math.random() >= 0.5) {
                         set(e, 'a')
                     }
                     return e
                 }))
 
-        const is_alive = (e, a = 'a') => e.classList.contains(a)
-        const neighbors = e => {
-            let [x, y] = e.getAttribute('data-c').split('|');
-            let coords = [];
-            for (k = x - 1; k < x + 2; k++) {
-                for (j = y - 1; j < y + 2; j++) {
-                    if (k != x && j != y) {
-                        const n = elements[k]?.[j]
-                        if (n && is_alive(n)) {
-                            coords.push(n)
+        const is_alive = (e) => e && cl(e).contains('a')
+        const neighbors = (y, x) => {
+            let n = 0;
+            for (let k = y - 1; k < y + 2; k++) {
+                for (let j = x - 1; j < x + 2; j++) {
+                    if (k != y || j != x) {
+                        if (is_alive(elements[k]?.[j])) {
+                            n++;
                         }
                     }
                 }
             }
-            return coords.length
+            return n
         }
         const step = () => {
-            for (const row of elements) {
-                for (const e of row) {
+            for (let y in elements) {
+                for (let x in elements[y]) {
+                    const e = elements[y][x];
                     ['b', 'l', 'c'].map(l => clear(e, l));
-                    let m = neighbors(e);
-                    if (is_alive(e)) {
-                        if (m < 2) {
-                            set(e, 'l', 'a')
-                        } else if (m > 3) {
-                            set(e, 'c', 'a')
-                        }
-                    } else {
-                        if (m === 3) {
-                            set(e, 'b');
-                            t(() => set(e, 'a', 'b'), 500)
-                        }
+                    let m = neighbors(parseInt(y), parseInt(x));
+                    const a = is_alive(e)
+                    if (a && m < 2) {
+                        set(e, 'l', 'a')
+                    } else if (a && m > 3) {
+                        set(e, 'c', 'a')
+                    } else if (!a && m == 3) {
+                        set(e, 'b');
+                        t(() => set(e, 'a', 'b'), 250)
                     }
                 }
             }
-            t(step, 600)
         }
-        t(step, 600)
+        setInterval(step, 600)
+        const audioCtx = new AudioContext();
+const analyser = audioCtx.createAnalyser();
+analyser.fftSize = width*width;
+const bufferLength = analyser.frequencyBinCount;
+const dataArray = new Uint8Array(bufferLength);
+navigator.mediaDevices.getUserMedia({audio: true}).then(stream=>{
+    const source = audioCtx.createMediaStreamSource(stream);
+source.connect(analyser);
+})
     </script>
 </body>
 
