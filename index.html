@@ -7,8 +7,8 @@
             display: fixed;
             inset: 0;
             display: grid;
-            grid-template-columns: repeat(25, 1fr);
-            grid-template-rows: repeat(25, 1fr);
+            grid-template-columns: repeat(32, 1fr);
+            grid-template-rows: repeat(32, 1fr);
             color: #026;
             background: #026;
             aspect-ratio: 1;
@@ -87,11 +87,11 @@
         }
     </style>
     <script>
-        const width = 25
+        const width = 32
         const column = v => (v * width) || 1
         const d = document
-        const ce = t=>d.createElement(t)
-        const ac = (e,c) => e.appendChild(c);
+        const ce = t => d.createElement(t)
+        const ac = (e, c) => e.appendChild(c);
         const t = setTimeout
         const g = d.getElementById('g')
         const cl = e => e.classList
@@ -107,11 +107,8 @@
                 .map((z, x) => {
                     const e = ce('button')
                     e.onclick = () => cl(e).toggle('a')
-                    ac(e,ce('i'))
+                    ac(e, ce('i'))
                     ac(g, e)
-                    if (Math.random() >= 0.5) {
-                        set(e, 'a')
-                    }
                     return e
                 }))
 
@@ -129,7 +126,46 @@
             }
             return n
         }
+        let running = false;
+        navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+            const audioCtx = new AudioContext();
+            const source = audioCtx.createMediaStreamSource(stream);
+
+            const analyser = audioCtx.createAnalyser();
+            analyser.fftSize = width * width * 2;
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            source.connect(analyser);
+
+            running = true;
+
+            const draw = () => {
+                requestAnimationFrame(draw);
+
+                analyser.getByteTimeDomainData(dataArray);
+
+                for (let i in dataArray) {
+                    let y = Math.floor(i / width);
+                    let x = i % width;
+                    let v = dataArray[i] / 2.0;
+                    const e = elements[y][x];
+                    if (v > 80) {
+                        set(e, 'a')
+                        if (v > 90) {
+                            set(e, 'c', 'a')
+                        }
+                    } else if (v < 40) {
+                        clear(a, 'a')
+                    }
+                }
+            }
+            draw();
+        })
         const step = () => {
+            if (!running) {
+                return;
+            }
             for (let y in elements) {
                 for (let x in elements[y]) {
                     const e = elements[y][x];
@@ -147,16 +183,7 @@
                 }
             }
         }
-        setInterval(step, 600)
-        const audioCtx = new AudioContext();
-const analyser = audioCtx.createAnalyser();
-analyser.fftSize = width*width;
-const bufferLength = analyser.frequencyBinCount;
-const dataArray = new Uint8Array(bufferLength);
-navigator.mediaDevices.getUserMedia({audio: true}).then(stream=>{
-    const source = audioCtx.createMediaStreamSource(stream);
-source.connect(analyser);
-})
+        setInterval(step, 600);
     </script>
 </body>
 
