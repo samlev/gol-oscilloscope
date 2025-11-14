@@ -163,9 +163,6 @@
             draw();
         })
         const step = () => {
-            if (!running) {
-                return;
-            }
             for (let y in elements) {
                 for (let x in elements[y]) {
                     const e = elements[y][x];
