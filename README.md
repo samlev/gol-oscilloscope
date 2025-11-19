@@ -5,4 +5,6 @@ as a seed via as an oscilloscope.
 
 [Code golfing](https://en.wikipedia.org/wiki/Code_golf) it down smaller was my own challenge.
 
+You can see it at [https://samlev.dev/gol-oscilloscope.html](https://samlev.dev/gol-oscilloscope.html)
+
 Currently at 826 bytes.
